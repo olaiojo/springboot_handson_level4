@@ -6,8 +6,8 @@
     <!-- タイトル -->
     <title th:text="${title}">Title</title>
     <!-- 共通CSS -->
-    <link th:href="@{/css/common.css}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="webjars/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link th:href="@{/css/common.css}" rel="stylesheet" type="text/css">
     <!-- viewごとのCSS なければ何もしない -->
     <th:block th:replace="${links}?: _"/>
     <!-- 共通JS -->
