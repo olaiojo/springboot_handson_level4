@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head th:fragment="head_fragment(title, links, scripts)">
+    <meta charset="UTF-8">
+    <!-- タイトル -->
+    <title th:text="${title}">Title</title>
+    <!-- 共通CSS -->
+    <link th:href="@{/css/common.css}" rel="stylesheet" type="text/css">
+    <!-- viewごとのCSS なければ何もしない -->
+    <th:block th:replace="${links}?: _"/>
+    <!-- 共通JS -->
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <!-- viewごとのJS なければ何もしない -->
+    <th:block th:replace="${scripts}?: _"/>
+</head>
+
+<body>
+
+</body>
+
+</html>
