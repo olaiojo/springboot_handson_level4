@@ -11,7 +11,7 @@ public class ResultInfo {
     private Integer Count;
     private Integer Total;
     private Integer Start;
-    private Integer Latency;
+    private Double Latency;
     private Integer Status;
     private String Description;
     private String Copyright;
