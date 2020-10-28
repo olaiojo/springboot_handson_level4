@@ -1,5 +1,6 @@
 package com.daigo.springboot_handson_4.domains;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Element {
-    private String Name;
-    private String Kana;
+    @JsonProperty("Name")
+    private String name;
+    @JsonProperty("Kana")
+    private String kana;
 }

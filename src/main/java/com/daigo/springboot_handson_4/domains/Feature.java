@@ -1,5 +1,6 @@
 package com.daigo.springboot_handson_4.domains;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,9 +9,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Feature {
-    private Integer Id;
-    private String Name;
-    private String Description;
-    private Geometry Geometry;
-    private Property Property;
+    @JsonProperty("Id")
+    private Integer id;
+    @JsonProperty("Name")
+    private String name;
+    @JsonProperty("Description")
+    private String description;
+    @JsonProperty("Geometry")
+    private Geometry geometry;
+    @JsonProperty("Property")
+    private Property property;
 }

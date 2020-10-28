@@ -1,5 +1,6 @@
 package com.daigo.springboot_handson_4.domains;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Geometry {
-    private String Type;
-    private String Coordinates;
+    @JsonProperty("Type")
+    private String type;
+    @JsonProperty("Coordinates")
+    private String coordinates;
 }

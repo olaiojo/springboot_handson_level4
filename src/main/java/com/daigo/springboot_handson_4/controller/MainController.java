@@ -35,13 +35,15 @@ public class MainController {
             System.out.println("|||||||||| Error 5XX ||||||||||");
             throw e;
         }
+        model.addAttribute("geo", contentsGeoCoder.getResultInfo().getDescription());
 
         System.out.println("==========debug zone===========");
         System.out.println(REQUEST_URL);
         System.out.println("contentsGeoCoder nonNull? : " + Objects.nonNull(contentsGeoCoder)); //true
         System.out.println("ResultInfo nonNull? : " + Objects.nonNull(contentsGeoCoder.getResultInfo())); // false
-        System.out.println("Feature nonNull? : " + Objects.nonNull(contentsGeoCoder.getFeature())); // false
+        System.out.println("Feature nonNull? : " + Objects.nonNull(contentsGeoCoder.getFeatureList())); // false
         System.out.println("Request Response" + restTemplate.getForObject(REQUEST_URL, String.class));
+        System.out.println(contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates());
         System.out.println("==========/debug zone===========");
 
         return "index";
