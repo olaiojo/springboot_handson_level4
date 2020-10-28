@@ -28,7 +28,6 @@ public class MainController {
         ContentsGeoCoder contentsGeoCoder = new ContentsGeoCoder();
         try {
             contentsGeoCoder = restTemplate.getForObject(REQUEST_URL, ContentsGeoCoder.class);
-            model.addAttribute("geo", contentsGeoCoder.getResultInfo());
         }catch (HttpClientErrorException e) {
             System.out.println("|||||||||| Error 4XX ||||||||||");
             throw e;
@@ -42,6 +41,7 @@ public class MainController {
         System.out.println("contentsGeoCoder nonNull? : " + Objects.nonNull(contentsGeoCoder)); //true
         System.out.println("ResultInfo nonNull? : " + Objects.nonNull(contentsGeoCoder.getResultInfo())); // false
         System.out.println("Feature nonNull? : " + Objects.nonNull(contentsGeoCoder.getFeature())); // false
+        System.out.println("Request Response" + restTemplate.getForObject(REQUEST_URL, String.class));
         System.out.println("==========/debug zone===========");
 
         return "index";
