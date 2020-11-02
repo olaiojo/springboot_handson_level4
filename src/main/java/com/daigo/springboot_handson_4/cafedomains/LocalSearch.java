@@ -14,5 +14,5 @@ public class LocalSearch {
     @JsonProperty("ResultInfo")
     private ResultInfo resultInfo;
     @JsonProperty("Feature")
-    private List<Feature> feature;
+    private List<Feature> features_list;
 }

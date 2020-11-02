@@ -13,6 +13,11 @@
 <p>「<span th:text="${userLocation}"></span>」での検索結果</p>
 <p>中心地点: <span th:text="${coordinates}"></span></p>
 <p>検索件数: <span th:text="${resultsNumber}"></span></p>
+<p>検索結果:</p>
+
+<ul th:each="feature : ${features}">
+    <li th:text="${feature.name}"></li>
+</ul>
 
 </body>
 </html>
