@@ -10,3 +10,9 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: "Helvetica Neue", Helvetica, Arial, "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, 'Open Sans', sans-serif;
 }
+
+.table_border, .table_border td, .table_border th {
+    width: 50%;
+    border: solid 1px #000000;
+    border-collapse: separate;
+}
