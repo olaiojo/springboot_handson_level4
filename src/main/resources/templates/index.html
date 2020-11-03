@@ -10,6 +10,14 @@
 <h1>Springboot Handson level.4</h1>
 <h2>最寄り駅のカフェ一覧を表示する</h2>
 
+<form action="#" th:action="@{/search}" method="GET">
+    <p>
+        <label for="userStation">検索する駅名:</label>
+        <input id="userStation" name="userStation" type="text" size="40"/>
+        <input type="submit" value="検索する"/>
+    </p>
+</form>
+
 <p>「<span th:text="${userLocation}"></span>」での検索結果</p>
 <p>中心地点: <span th:text="${coordinates}"></span></p>
 <p>検索件数: <span th:text="${resultsNumber}"></span></p>

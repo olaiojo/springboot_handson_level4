@@ -1,11 +1,11 @@
 package com.daigo.springboot_handson_4.controller;
 
 import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
-import com.daigo.springboot_handson_4.dev.SampleLocation;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -22,24 +22,35 @@ public class MainController {
     final String OUTPUT = "json";
 
     /**
-     * indexにアクセスがあったときのマッピングを行うメソッド
+     * indexにリクエストがあったときのマッピングを行うメソッド
      * @param model
      * @return "index"
      */
     @GetMapping("/index")
     public String index(Model model) {
-        /**
-         * 駅名の指定を行う機能
-         */
-        //TODO: ユーザ入力を受け取る機能
-        //開発用に湘南台駅の文字列を指定。
-        final SampleLocation userLocation = new SampleLocation("湘南台駅");
+        return "index";
+    }
 
+    /**
+     * searchにリクエストがあったときのマッピングを行うメソッド
+     * @param model
+     * @param userLocation フォーム(name="userStation")の入力値
+     * @return "index"
+     */
+    @GetMapping("/search")
+    public String search(Model model, @ModelAttribute("userStation") String userLocation) {
         /**
          * userLocationをコンテンツジオコーダAPIに渡してレスポンスを受け取る機能
+         * userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
          * @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/contentsgeocoder.html">YOLP(地図)コンテンツジオコーダAPI</a>
          */
-        final String LOCATION = userLocation.getSAMPLE_LOCATION(); //クエリとなるロケーション
+        String LOCATION; //ロケーション
+        if (userLocation.isEmpty()) {
+            LOCATION = "湘南台駅";
+        } else {
+            LOCATION = userLocation;
+        }
+        System.out.println("LOCATION:"+LOCATION);
         final String CATEGORY = "landmark"; //カテゴリ
         final String REQUEST_URL = "https://map.yahooapis.jp/geocode/cont/V1/contentsGeoCoder"
                 + "?appid=" + APPID
