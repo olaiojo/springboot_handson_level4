@@ -16,50 +16,14 @@
 <p>検索結果:</p>
 
 <table class="table_border">
-    <tr>
+    <thead>
         <th>店名</th>
         <th>住所</th>
-    </tr>
-    <tr>
-        <td th:text="${features[0].name}"></td>
-        <td th:text="${features[0].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[1].name}"></td>
-        <td th:text="${features[1].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[2].name}"></td>
-        <td th:text="${features[2].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[3].name}"></td>
-        <td th:text="${features[3].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[4].name}"></td>
-        <td th:text="${features[4].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[5].name}"></td>
-        <td th:text="${features[5].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[6].name}"></td>
-        <td th:text="${features[6].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[7].name}"></td>
-        <td th:text="${features[7].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[8].name}"></td>
-        <td th:text="${features[8].property.address}"></td>
-    </tr>
-    <tr>
-        <td th:text="${features[9].name}"></td>
-        <td th:text="${features[9].property.address}"></td>
-    </tr>
+    </thead>
+    <tbody th:each="feature : ${features}">
+        <td th:text="${feature.name}"></td>
+        <td th:text="${feature.property.address}"></td>
+    </tbody>
 </table>
 
 </body>
