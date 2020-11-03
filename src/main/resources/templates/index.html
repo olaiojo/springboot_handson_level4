@@ -7,8 +7,14 @@
 
 <body>
 
-<h1>Springboot Handson level.4</h1>
-<h2>最寄り駅のカフェ一覧を表示する</h2>
+<nav class="navbar navbar-expand-lg navbar-custom navbar-dark fixed-top" th:fragment="navbar_fragment">
+    <div class="container">
+        <a class="navbar-brand" href="http://localhost:8080/index">Springboot Hands-on level.4</a>
+    </div>
+</nav>
+
+<div class="container">
+<h1>最寄り駅のカフェ一覧を表示する</h1>
 
 <form action="#" th:action="@{/search}" method="GET">
     <p>
@@ -23,7 +29,7 @@
 <p>検索件数: <span th:text="${resultsNumber}"></span></p>
 <p>検索結果:</p>
 
-<table class="table_border">
+<table class="table_border w-75">
     <thead>
         <th>店名</th>
         <th>住所</th>
@@ -33,6 +39,6 @@
         <td th:text="${feature.property.address}"></td>
     </tbody>
 </table>
-
+</div>
 </body>
 </html>
