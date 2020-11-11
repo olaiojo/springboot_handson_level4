@@ -2,6 +2,7 @@ package com.daigo.springboot_handson_4.controller;
 
 import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,33 +17,35 @@ public class MainController {
     /**
      * Setting
      */
-    //appid
-    final String APPID = "dj00aiZpPVd0eW04MVNNRGtUbSZzPWNvbnN1bWVyc2VjcmV0Jng9YTc-";
+    //環境変数からappidのインジェクション
+    @Value("${app.id}")
+    String APPID;
     //出力形式
     final String OUTPUT = "json";
 
     /**
      * indexにリクエストがあったときのマッピングを行うメソッド
-     * @param model
+     *
      * @return "index"
      */
     @GetMapping("/index")
-    public String index(Model model) {
+    public String index() {
         return "index";
     }
 
     /**
      * searchにリクエストがあったときのマッピングを行うメソッド
-     * @param model
+     *
+     * @param model Model
      * @param userLocation フォーム(name="userStation")の入力値
      * @return "index"
      */
     @GetMapping("/search")
     public String search(Model model, @ModelAttribute("userStation") String userLocation) {
-        /**
-         * userLocationをコンテンツジオコーダAPIに渡してレスポンスを受け取る機能
-         * userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
-         * @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/contentsgeocoder.html">YOLP(地図)コンテンツジオコーダAPI</a>
+        /*
+          userLocationをコンテンツジオコーダAPIに渡してレスポンスを受け取る機能
+          userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
+          @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/contentsgeocoder.html">YOLP(地図)コンテンツジオコーダAPI</a>
          */
         String LOCATION; //ロケーション
         if (userLocation.isEmpty()) {
@@ -50,7 +53,7 @@ public class MainController {
         } else {
             LOCATION = userLocation;
         }
-        System.out.println("LOCATION:"+LOCATION);
+        System.out.println("LOCATION:" + LOCATION);
         final String CATEGORY = "landmark"; //カテゴリ
         final String REQUEST_URL = "https://map.yahooapis.jp/geocode/cont/V1/contentsGeoCoder"
                 + "?appid=" + APPID
@@ -69,13 +72,13 @@ public class MainController {
             throw e;
         }
 
-        /**
-         * coordinatesをローカルサーチAPIに渡してレスポンスを受け取る機能
-         * @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/localsearch.html">YOLP(地図)ローカルサーチAPI</a>
+        /*
+          coordinatesをローカルサーチAPIに渡してレスポンスを受け取る機能
+          @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/localsearch.html">YOLP(地図)ローカルサーチAPI</a>
          */
         final String[] LATLON = contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates().split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
         final String DIST = "10"; //中心(latLng)からの検索距離(km)
-        final Integer Results = 10; //取得件数
+        final int Results = 10; //取得件数
         final String GC = "0115001"; //業種コード(GC)
         final String REQUEST_URL_2 = "https://map.yahooapis.jp/search/local/V1/localSearch"
                 + "?appid=" + APPID
@@ -99,8 +102,8 @@ public class MainController {
             throw e;
         }
 
-        /**
-         * Modelにadd
+        /*
+          Modelにadd
          */
         model.addAttribute("userLocation", contentsGeoCoder.getFeatureList().get(0).getName()); //での検索結果
         model.addAttribute("coordinates", contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
