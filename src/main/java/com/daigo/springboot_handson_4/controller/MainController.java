@@ -41,7 +41,7 @@ public class MainController {
      * @return "index"
      */
     @GetMapping("/search")
-    public String search(Model model, @ModelAttribute("userStation") String userLocation) {
+    public String search(Model model, @ModelAttribute("userLocation") String userLocation) {
         /*
           userLocationをコンテンツジオコーダAPIに渡してレスポンスを受け取る機能
           userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
@@ -55,7 +55,7 @@ public class MainController {
         }
         System.out.println("LOCATION:" + LOCATION);
         final String CATEGORY = "landmark"; //カテゴリ
-        final String REQUEST_URL = "https://map.yahooapis.jp/geocode/cont/V1/contentsGeoCoder"
+        final String GEOCODER_URL = "https://map.yahooapis.jp/geocode/cont/V1/contentsGeoCoder"
                 + "?appid=" + APPID
                 + "&query=" + LOCATION
                 + "&category=" + CATEGORY
@@ -63,7 +63,7 @@ public class MainController {
         //ContentsGeoCoderクラスへのバインドをtry
         ContentsGeoCoder contentsGeoCoder = new ContentsGeoCoder();
         try {
-            contentsGeoCoder = restTemplate.getForObject(REQUEST_URL, ContentsGeoCoder.class);
+            contentsGeoCoder = restTemplate.getForObject(GEOCODER_URL, ContentsGeoCoder.class);
         } catch (HttpClientErrorException e) {
             System.out.println("|||||||||| Error 4XX ||||||||||");
             throw e;
@@ -80,7 +80,7 @@ public class MainController {
         final String DIST = "10"; //中心(latLng)からの検索距離(km)
         final int Results = 10; //取得件数
         final String GC = "0115001"; //業種コード(GC)
-        final String REQUEST_URL_2 = "https://map.yahooapis.jp/search/local/V1/localSearch"
+        final String LOCAL_SEARCH_URL = "https://map.yahooapis.jp/search/local/V1/localSearch"
                 + "?appid=" + APPID
                 + "&output=" + OUTPUT
                 + "&results=" + Results
@@ -89,11 +89,11 @@ public class MainController {
                 + "&lon=" + LATLON[0]
                 + "&dist=" + DIST
                 + "&sort=geo"; //距離順ソート
-        System.out.println(REQUEST_URL_2);
+        System.out.println(LOCAL_SEARCH_URL);
         //LocalSearchクラスへのバインドをtry
         LocalSearch localSearch = new LocalSearch();
         try {
-            localSearch = restTemplate.getForObject(REQUEST_URL_2, LocalSearch.class);
+            localSearch = restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
         } catch (HttpClientErrorException e) {
             System.out.println("|||||||||| Error 4XX ||||||||||");
             throw e;
@@ -108,7 +108,7 @@ public class MainController {
         model.addAttribute("userLocation", contentsGeoCoder.getFeatureList().get(0).getName()); //での検索結果
         model.addAttribute("coordinates", contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
         model.addAttribute("resultsNumber", localSearch.getResultInfo().getCount()); //検索件数
-        model.addAttribute("features", localSearch.getFeatures_list()); //検索結果
+        model.addAttribute("features", localSearch.getFeatureList()); //検索結果
 
         return "index";
     }

@@ -25,7 +25,7 @@ public class Feature {
     @JsonProperty("Description")
     private String description;
     @JsonProperty("Style")
-    private List<String> style;
+    private List<String> styleList;
     @JsonProperty("Property")
     private Property property;
 }
