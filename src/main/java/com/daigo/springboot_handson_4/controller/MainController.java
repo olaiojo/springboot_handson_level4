@@ -4,6 +4,7 @@ import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
 import com.daigo.springboot_handson_4.config.GeoCoderConfig;
 import com.daigo.springboot_handson_4.config.LocalSearchConfig;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
+@Slf4j
 public class MainController {
     private static final RestTemplate restTemplate = new RestTemplate();
     /**
@@ -65,7 +67,7 @@ public class MainController {
         } else {
             LOCATION = userLocation;
         }
-        System.out.println("LOCATION:" + LOCATION);
+        log.info("LOCATION: {}", LOCATION);
         final String CATEGORY = "landmark"; //カテゴリ
         final String GEOCODER_URL = UriComponentsBuilder
                 .fromHttpUrl(geoCoderConfig.getHost())
@@ -76,6 +78,7 @@ public class MainController {
                 .queryParam("output", OUTPUT)
                 .build()
                 .toString();
+        log.info("GEOCODER_URL: {}", GEOCODER_URL);
 
         //ContentsGeoCoderクラスへのバインドをtry
         new ContentsGeoCoder();
@@ -83,10 +86,10 @@ public class MainController {
         try {
             contentsGeoCoder = restTemplate.getForObject(GEOCODER_URL, ContentsGeoCoder.class);
         } catch (HttpClientErrorException e) {
-            System.out.println("|||||||||| Error 4XX ||||||||||");
+            log.error("HttpClientErrorException, ", e);
             throw e;
         } catch (HttpServerErrorException e) {
-            System.out.println("|||||||||| Error 5XX ||||||||||");
+            log.error("HttpServerErrorException, ", e);
             throw e;
         }
 
@@ -95,7 +98,11 @@ public class MainController {
           @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/localsearch.html">YOLP(地図)ローカルサーチAPI</a>
          */
         assert contentsGeoCoder != null : "contentsGeoCoder = (null)";
-        final String[] LATLON = contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()
+        final String[] LATLON = contentsGeoCoder
+                .getFeatureList()
+                .get(0)
+                .getGeometry()
+                .getCoordinates()
                 .split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
         final String DIST = "10"; //中心(latLng)からの検索距離(km)
         final int Results = 10; //取得件数
@@ -113,17 +120,17 @@ public class MainController {
                 .queryParam("sort", "geo")
                 .build()
                 .toString();
-        System.out.println(LOCAL_SEARCH_URL);
+        log.info("LOCAL_SEARCH_URL: {}", LOCAL_SEARCH_URL);
         //LocalSearchクラスへのバインドをtry
         new LocalSearch();
         LocalSearch localSearch;
         try {
             localSearch = restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
         } catch (HttpClientErrorException e) {
-            System.out.println("|||||||||| Error 4XX ||||||||||");
+            log.error("HttpClientErrorException, ", e);
             throw e;
         } catch (HttpServerErrorException e) {
-            System.out.println("|||||||||| Error 5XX ||||||||||");
+            log.error("HttpServerErrorException, ", e);
             throw e;
         }
 
