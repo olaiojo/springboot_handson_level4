@@ -1,7 +1,10 @@
 package com.daigo.springboot_handson_4.controller;
 
 import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
+import com.daigo.springboot_handson_4.config.GeoCoderConfig;
+import com.daigo.springboot_handson_4.config.LocalSearchConfig;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 public class MainController {
@@ -22,6 +26,11 @@ public class MainController {
     String APPID;
     //出力形式
     final String OUTPUT = "json";
+    //configクラスからのインジェクション
+    @Autowired
+    private GeoCoderConfig geoCoderConfig;
+    @Autowired
+    private LocalSearchConfig localSearchConfig;
 
     /**
      * indexにリクエストがあったときのマッピングを行うメソッド
@@ -36,7 +45,7 @@ public class MainController {
     /**
      * searchにリクエストがあったときのマッピングを行うメソッド
      *
-     * @param model Model
+     * @param model        Model
      * @param userLocation フォーム(name="userStation")の入力値
      * @return "index"
      */
@@ -55,11 +64,16 @@ public class MainController {
         }
         System.out.println("LOCATION:" + LOCATION);
         final String CATEGORY = "landmark"; //カテゴリ
-        final String GEOCODER_URL = "https://map.yahooapis.jp/geocode/cont/V1/contentsGeoCoder"
-                + "?appid=" + APPID
-                + "&query=" + LOCATION
-                + "&category=" + CATEGORY
-                + "&output=" + OUTPUT; //リクエストURLの合成
+        final String GEOCODER_URL = UriComponentsBuilder
+                .fromHttpUrl(geoCoderConfig.getHost())
+                .path(geoCoderConfig.getPath())
+                .queryParam("appid", APPID)
+                .queryParam("query", LOCATION)
+                .queryParam("category", CATEGORY)
+                .queryParam("output", OUTPUT)
+                .build()
+                .toString();
+
         //ContentsGeoCoderクラスへのバインドをtry
         ContentsGeoCoder contentsGeoCoder = new ContentsGeoCoder();
         try {
@@ -76,19 +90,24 @@ public class MainController {
           coordinatesをローカルサーチAPIに渡してレスポンスを受け取る機能
           @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/localsearch.html">YOLP(地図)ローカルサーチAPI</a>
          */
-        final String[] LATLON = contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates().split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
+        final String[] LATLON = contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()
+                .split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
         final String DIST = "10"; //中心(latLng)からの検索距離(km)
         final int Results = 10; //取得件数
         final String GC = "0115001"; //業種コード(GC)
-        final String LOCAL_SEARCH_URL = "https://map.yahooapis.jp/search/local/V1/localSearch"
-                + "?appid=" + APPID
-                + "&output=" + OUTPUT
-                + "&results=" + Results
-                + "&gc=" + GC
-                + "&lat=" + LATLON[1]
-                + "&lon=" + LATLON[0]
-                + "&dist=" + DIST
-                + "&sort=geo"; //距離順ソート
+        final String LOCAL_SEARCH_URL = UriComponentsBuilder
+                .fromHttpUrl(localSearchConfig.getHost())
+                .path(localSearchConfig.getPath())
+                .queryParam("appid", APPID)
+                .queryParam("output", OUTPUT)
+                .queryParam("results", Results)
+                .queryParam("gc", GC)
+                .queryParam("lat", LATLON[1])
+                .queryParam("lon", LATLON[0])
+                .queryParam("dist", DIST)
+                .queryParam("sort", "geo")
+                .build()
+                .toString();
         System.out.println(LOCAL_SEARCH_URL);
         //LocalSearchクラスへのバインドをtry
         LocalSearch localSearch = new LocalSearch();
@@ -106,7 +125,8 @@ public class MainController {
           Modelにadd
          */
         model.addAttribute("userLocation", contentsGeoCoder.getFeatureList().get(0).getName()); //での検索結果
-        model.addAttribute("coordinates", contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
+        model.addAttribute("coordinates",
+                contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
         model.addAttribute("resultsNumber", localSearch.getResultInfo().getCount()); //検索件数
         model.addAttribute("features", localSearch.getFeatureList()); //検索結果
 
