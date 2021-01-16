@@ -4,7 +4,6 @@ import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
 import com.daigo.springboot_handson_4.config.GeoCoderConfig;
 import com.daigo.springboot_handson_4.config.LocalSearchConfig;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,10 +26,14 @@ public class MainController {
     //出力形式
     final String OUTPUT = "json";
     //configクラスからのインジェクション
-    @Autowired
-    private GeoCoderConfig geoCoderConfig;
-    @Autowired
-    private LocalSearchConfig localSearchConfig;
+    private final GeoCoderConfig geoCoderConfig;
+    private final LocalSearchConfig localSearchConfig;
+
+    public MainController(GeoCoderConfig geoCoderConfig,
+                          LocalSearchConfig localSearchConfig) {
+        this.geoCoderConfig = geoCoderConfig;
+        this.localSearchConfig = localSearchConfig;
+    }
 
     /**
      * indexにリクエストがあったときのマッピングを行うメソッド
@@ -75,7 +78,8 @@ public class MainController {
                 .toString();
 
         //ContentsGeoCoderクラスへのバインドをtry
-        ContentsGeoCoder contentsGeoCoder = new ContentsGeoCoder();
+        new ContentsGeoCoder();
+        ContentsGeoCoder contentsGeoCoder;
         try {
             contentsGeoCoder = restTemplate.getForObject(GEOCODER_URL, ContentsGeoCoder.class);
         } catch (HttpClientErrorException e) {
@@ -90,6 +94,7 @@ public class MainController {
           coordinatesをローカルサーチAPIに渡してレスポンスを受け取る機能
           @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/localsearch.html">YOLP(地図)ローカルサーチAPI</a>
          */
+        assert contentsGeoCoder != null : "contentsGeoCoder = (null)";
         final String[] LATLON = contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()
                 .split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
         final String DIST = "10"; //中心(latLng)からの検索距離(km)
@@ -110,7 +115,8 @@ public class MainController {
                 .toString();
         System.out.println(LOCAL_SEARCH_URL);
         //LocalSearchクラスへのバインドをtry
-        LocalSearch localSearch = new LocalSearch();
+        new LocalSearch();
+        LocalSearch localSearch;
         try {
             localSearch = restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
         } catch (HttpClientErrorException e) {
@@ -127,8 +133,12 @@ public class MainController {
         model.addAttribute("userLocation", contentsGeoCoder.getFeatureList().get(0).getName()); //での検索結果
         model.addAttribute("coordinates",
                 contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
-        model.addAttribute("resultsNumber", localSearch.getResultInfo().getCount()); //検索件数
-        model.addAttribute("features", localSearch.getFeatureList()); //検索結果
+        if (localSearch != null) {
+            model.addAttribute("resultsNumber", localSearch.getResultInfo().getCount()); //検索件数
+            model.addAttribute("features", localSearch.getFeatureList()); //検索結果
+        } else {
+            model.addAttribute("resultsNumber", 0);
+        }
 
         return "index";
     }
