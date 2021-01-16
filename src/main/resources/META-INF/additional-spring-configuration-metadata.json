@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "app.id",
+      "type": "java.lang.String",
+      "description": "Description for app.id."
+    },
+    {
+      "name": "geocoder.host",
+      "type": "java.lang.String",
+      "description": "Description for geocoder.host."
+    },
+    {
+      "name": "geocoder.path",
+      "type": "java.lang.String",
+      "description": "Description for geocoder.path."
+    },
+    {
+      "name": "localsearch.host",
+      "type": "java.lang.String",
+      "description": "Description for localsearch.host."
+    },
+    {
+      "name": "localsearch.path",
+      "type": "java.lang.String",
+      "description": "Description for localsearch.path."
+    }
+  ]
+}
