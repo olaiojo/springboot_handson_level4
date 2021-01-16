@@ -14,31 +14,38 @@
 </nav>
 
 <div class="container">
-<h1>検索したロケーションに近いカフェ一覧を表示する</h1>
+    <h1>検索したロケーションに近いカフェ一覧を表示する</h1>
 
-<form action="#" th:action="@{/search}" method="GET">
-    <p>
-        <label for="userLocation">検索するロケーション:</label>
-        <input id="userLocation" name="userLocation" type="text" size="40"/>
-        <input type="submit" value="検索する"/>
-    </p>
-</form>
+    <form action="#" th:action="@{/search}" method="GET">
+        <p>
+            <label for="userLocation">検索するロケーション:</label>
+            <input id="userLocation" name="userLocation" type="text" size="40"/>
+            <input type="submit" value="検索する"/>
+        </p>
+    </form>
+    <div th:if="${userLocation}">
+        <p>「<span th:text="${userLocation}"></span>」での検索結果</p>
+    </div>
+    <div th:if="${coordinates}">
+        <p>中心地点: <span th:text="${coordinates}"></span></p>
+    </div>
+    <div th:if="${resultsNumber}">
+        <p>検索件数: <span th:text="${resultsNumber}"></span></p>
+    </div>
 
-<p>「<span th:text="${userLocation}"></span>」での検索結果</p>
-<p>中心地点: <span th:text="${coordinates}"></span></p>
-<p>検索件数: <span th:text="${resultsNumber}"></span></p>
-<p>検索結果:</p>
-
-<table class="table_border w-75">
-    <thead>
-        <th>店名</th>
-        <th>住所</th>
-    </thead>
-    <tbody th:each="feature : ${features}">
-        <td th:text="${feature.name}"></td>
-        <td th:text="${feature.property.address}"></td>
-    </tbody>
-</table>
+    <div th:if="${features}">
+        <p>検索結果:</p>
+        <table class="table_border w-75">
+            <thead>
+            <th>店名</th>
+            <th>住所</th>
+            </thead>
+            <tbody th:each="feature : ${features}">
+            <td th:text="${feature.name}"></td>
+            <td th:text="${feature.property.address}"></td>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>
