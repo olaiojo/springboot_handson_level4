@@ -7,6 +7,7 @@ import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class MainController {
     private static final RestTemplate restTemplate = new RestTemplate();
     /**
@@ -33,12 +35,6 @@ public class MainController {
     //configクラスからのインジェクション
     private final GeoCoderConfig geoCoderConfig;
     private final LocalSearchConfig localSearchConfig;
-
-    public MainController(GeoCoderConfig geoCoderConfig,
-                          LocalSearchConfig localSearchConfig) {
-        this.geoCoderConfig = geoCoderConfig;
-        this.localSearchConfig = localSearchConfig;
-    }
 
     /**
      * indexにリクエストがあったときのマッピングを行うメソッド
