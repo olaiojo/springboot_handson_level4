@@ -24,7 +24,10 @@
         </p>
     </form>
     <div th:if="${userLocation}">
-        <p>「<span th:text="${userLocation}"></span>」での検索結果</p>
+        <p>「<span th:text="${userLocation}"></span>」での検索</p>
+    </div>
+    <div th:if="${userLocation}">
+        <p><span th:text="${message}"></span></p>
     </div>
     <div th:if="${coordinates}">
         <p>中心地点: <span th:text="${coordinates}"></span></p>

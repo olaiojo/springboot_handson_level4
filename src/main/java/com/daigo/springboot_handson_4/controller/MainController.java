@@ -4,6 +4,9 @@ import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
 import com.daigo.springboot_handson_4.config.GeoCoderConfig;
 import com.daigo.springboot_handson_4.config.LocalSearchConfig;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -55,7 +58,8 @@ public class MainController {
      * @return "index"
      */
     @GetMapping("/search")
-    public String search(Model model, @ModelAttribute("userLocation") String userLocation) {
+    public String search(Model model, @ModelAttribute("userLocation") String userLocation)
+            throws JsonProcessingException {
         /*
           userLocationをコンテンツジオコーダAPIに渡してレスポンスを受け取る機能
           userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
@@ -79,74 +83,64 @@ public class MainController {
                 .build()
                 .toString();
         log.info("GEOCODER_URL: {}", GEOCODER_URL);
-
-        //ContentsGeoCoderクラスへのバインドをtry
         new ContentsGeoCoder();
         ContentsGeoCoder contentsGeoCoder;
-        try {
-            contentsGeoCoder = restTemplate.getForObject(GEOCODER_URL, ContentsGeoCoder.class);
-        } catch (HttpClientErrorException e) {
-            log.error("HttpClientErrorException, ", e);
-            throw e;
-        } catch (HttpServerErrorException e) {
-            log.error("HttpServerErrorException, ", e);
-            throw e;
-        }
-
+        String response = restTemplate.getForObject(GEOCODER_URL, String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        contentsGeoCoder = mapper.readValue(response, ContentsGeoCoder.class);
+        if (Objects.isNull(contentsGeoCoder.getFeatureList())) {
+            model.addAttribute("userLocation", userLocation);
+            model.addAttribute("message", "ロケーションが見つかりませんでした。");
+            model.addAttribute("resultsNumber", "0"); //検索件数
+        } else {
         /*
-          coordinatesをローカルサーチAPIに渡してレスポンスを受け取る機能
+          coordinatesをローカルサーチAPIに渡してレスポンスを受け取る
           @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/localsearch.html">YOLP(地図)ローカルサーチAPI</a>
          */
-        assert contentsGeoCoder != null : "contentsGeoCoder = (null)";
-        final String[] LATLON = contentsGeoCoder
-                .getFeatureList()
-                .get(0)
-                .getGeometry()
-                .getCoordinates()
-                .split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
-        final String DIST = "10"; //中心(latLng)からの検索距離(km)
-        final int Results = 10; //取得件数
-        final String GC = "0115001"; //業種コード(GC)
-        final String LOCAL_SEARCH_URL = UriComponentsBuilder
-                .fromHttpUrl(localSearchConfig.getHost())
-                .path(localSearchConfig.getPath())
-                .queryParam("appid", APPID)
-                .queryParam("output", OUTPUT)
-                .queryParam("results", Results)
-                .queryParam("gc", GC)
-                .queryParam("lat", LATLON[1])
-                .queryParam("lon", LATLON[0])
-                .queryParam("dist", DIST)
-                .queryParam("sort", "geo")
-                .build()
-                .toString();
-        log.info("LOCAL_SEARCH_URL: {}", LOCAL_SEARCH_URL);
-        //LocalSearchクラスへのバインドをtry
-        new LocalSearch();
-        LocalSearch localSearch;
-        try {
-            localSearch = restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
-        } catch (HttpClientErrorException e) {
-            log.error("HttpClientErrorException, ", e);
-            throw e;
-        } catch (HttpServerErrorException e) {
-            log.error("HttpServerErrorException, ", e);
-            throw e;
+            final String[] LATLON = contentsGeoCoder
+                    .getFeatureList()
+                    .get(0)
+                    .getGeometry()
+                    .getCoordinates()
+                    .split(",", 0); //coordinatesを緯度と経度に分割 latLng[0]:経度 latLng[1]:緯度
+            final String DIST = "10"; //中心(latLng)からの検索距離(km)
+            final int Results = 10; //取得件数
+            final String GC = "0115001"; //業種コード(GC)
+            final String LOCAL_SEARCH_URL = UriComponentsBuilder
+                    .fromHttpUrl(localSearchConfig.getHost())
+                    .path(localSearchConfig.getPath())
+                    .queryParam("appid", APPID)
+                    .queryParam("output", OUTPUT)
+                    .queryParam("results", Results)
+                    .queryParam("gc", GC)
+                    .queryParam("lat", LATLON[1])
+                    .queryParam("lon", LATLON[0])
+                    .queryParam("dist", DIST)
+                    .queryParam("sort", "geo")
+                    .build()
+                    .toString();
+            log.info("LOCAL_SEARCH_URL: {}", LOCAL_SEARCH_URL);
+            new LocalSearch();
+            LocalSearch localSearch;
+            try {
+                localSearch = restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
+            } catch (HttpClientErrorException e) {
+                log.error("HttpClientErrorException, ", e);
+                throw e;
+            } catch (HttpServerErrorException e) {
+                log.error("HttpServerErrorException, ", e);
+                throw e;
+            }
+            model.addAttribute("userLocation", contentsGeoCoder.getFeatureList().get(0).getName()); //での検索結果
+            model.addAttribute("coordinates",
+                    contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
+            if (Objects.nonNull(localSearch)) {
+                model.addAttribute("resultsNumber", localSearch.getResultInfo().getCount()); //検索件数
+                model.addAttribute("features", localSearch.getFeatureList()); //検索結果
+            } else {
+                model.addAttribute("resultsNumber", "0");
+            }
         }
-
-        /*
-          Modelにadd
-         */
-        model.addAttribute("userLocation", contentsGeoCoder.getFeatureList().get(0).getName()); //での検索結果
-        model.addAttribute("coordinates",
-                contentsGeoCoder.getFeatureList().get(0).getGeometry().getCoordinates()); //中心地点
-        if (localSearch != null) {
-            model.addAttribute("resultsNumber", localSearch.getResultInfo().getCount()); //検索件数
-            model.addAttribute("features", localSearch.getFeatureList()); //検索結果
-        } else {
-            model.addAttribute("resultsNumber", 0);
-        }
-
         return "index";
     }
 }
