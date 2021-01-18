@@ -3,13 +3,13 @@ package com.daigo.springboot_handson_4.controller;
 import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
 import com.daigo.springboot_handson_4.config.GeoCoderConfig;
 import com.daigo.springboot_handson_4.config.LocalSearchConfig;
+import com.daigo.springboot_handson_4.config.YahooApiConfig;
 import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +27,10 @@ public class MainController {
     /**
      * Setting
      */
-    //環境変数からappidのインジェクション
-    @Value("${app.id}")
-    String APPID;
     //出力形式
     final String OUTPUT = "json";
     //configクラスからのインジェクション
+    private final YahooApiConfig yahooApiConfig;
     private final GeoCoderConfig geoCoderConfig;
     private final LocalSearchConfig localSearchConfig;
 
@@ -61,6 +59,7 @@ public class MainController {
           userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
           @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/contentsgeocoder.html">YOLP(地図)コンテンツジオコーダAPI</a>
          */
+        String APPID = yahooApiConfig.getAppId();
         String location; //ロケーション
         if (userLocation.isEmpty()) {
             location = "湘南台駅";
