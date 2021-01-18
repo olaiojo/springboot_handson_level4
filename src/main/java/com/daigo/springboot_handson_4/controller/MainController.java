@@ -61,19 +61,19 @@ public class MainController {
           userLocationに何も入力されなかった場合はサンプルとして湘南台駅が使用される
           @see <a href="https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/contentsgeocoder.html">YOLP(地図)コンテンツジオコーダAPI</a>
          */
-        String LOCATION; //ロケーション
+        String location; //ロケーション
         if (userLocation.isEmpty()) {
-            LOCATION = "湘南台駅";
+            location = "湘南台駅";
         } else {
-            LOCATION = userLocation;
+            location = userLocation;
         }
-        log.info("LOCATION: {}", LOCATION);
+        log.info("LOCATION: {}", location);
         final String CATEGORY = "landmark"; //カテゴリ
         final String GEOCODER_URL = UriComponentsBuilder
                 .fromHttpUrl(geoCoderConfig.getHost())
                 .path(geoCoderConfig.getPath())
                 .queryParam("appid", APPID)
-                .queryParam("query", LOCATION)
+                .queryParam("query", location)
                 .queryParam("category", CATEGORY)
                 .queryParam("output", OUTPUT)
                 .build()
@@ -116,8 +116,7 @@ public class MainController {
                     .build()
                     .toString();
             log.info("LOCAL_SEARCH_URL: {}", LOCAL_SEARCH_URL);
-            new LocalSearch();
-            LocalSearch localSearch;
+            LocalSearch localSearch = new LocalSearch();
             try {
                 localSearch = restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
             } catch (HttpClientErrorException e) {
