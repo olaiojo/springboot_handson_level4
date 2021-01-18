@@ -1,6 +1,5 @@
 package com.daigo.springboot_handson_4.domains.geocoder;
 
-import com.daigo.springboot_handson_4.domains.yahooapi.ResultInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.Getter;

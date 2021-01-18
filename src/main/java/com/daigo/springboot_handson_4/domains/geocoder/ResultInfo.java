@@ -1,4 +1,4 @@
-package com.daigo.springboot_handson_4.domains.yahooapi;
+package com.daigo.springboot_handson_4.domains.geocoder;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
