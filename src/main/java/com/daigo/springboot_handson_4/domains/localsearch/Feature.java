@@ -1,12 +1,11 @@
-package com.daigo.springboot_handson_4.cafedomains;
+package com.daigo.springboot_handson_4.domains.localsearch;
 
-import com.daigo.springboot_handson_4.domains.Geometry;
+import com.daigo.springboot_handson_4.domains.geocoder.Geometry;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Setter
 @Getter

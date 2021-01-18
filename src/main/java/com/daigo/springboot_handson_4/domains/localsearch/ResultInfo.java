@@ -1,4 +1,4 @@
-package com.daigo.springboot_handson_4.cafedomains;
+package com.daigo.springboot_handson_4.domains.localsearch;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

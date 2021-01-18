@@ -1,4 +1,4 @@
-package com.daigo.springboot_handson_4.domains;
+package com.daigo.springboot_handson_4.domains.localsearch;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
@@ -6,13 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@Getter
 @Setter
-public class ContentsGeoCoder {
+@Getter
+@NoArgsConstructor
+public class LocalSearch {
     @JsonProperty("ResultInfo")
     private ResultInfo resultInfo;
     @JsonProperty("Feature")
     private List<Feature> featureList;
 }
-

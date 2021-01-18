@@ -1,4 +1,4 @@
-package com.daigo.springboot_handson_4.domains;
+package com.daigo.springboot_handson_4.domains.yahooapi;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

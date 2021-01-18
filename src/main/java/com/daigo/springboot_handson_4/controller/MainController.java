@@ -1,10 +1,10 @@
 package com.daigo.springboot_handson_4.controller;
 
-import com.daigo.springboot_handson_4.cafedomains.LocalSearch;
 import com.daigo.springboot_handson_4.config.GeoCoderConfig;
 import com.daigo.springboot_handson_4.config.LocalSearchConfig;
 import com.daigo.springboot_handson_4.config.YahooApiConfig;
-import com.daigo.springboot_handson_4.domains.ContentsGeoCoder;
+import com.daigo.springboot_handson_4.domains.geocoder.ContentsGeoCoder;
+import com.daigo.springboot_handson_4.domains.localsearch.LocalSearch;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
