@@ -3,8 +3,8 @@ package com.daigo.springboot_handson_4.controller;
 import com.daigo.springboot_handson_4.domains.CafeSearchMessenger;
 import com.daigo.springboot_handson_4.service.MainService;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class MainController {
-    @Autowired
-    MainService mainService;
+    // injection
+    final MainService mainService;
 
     /**
      * indexにリクエストがあったときのマッピングを行うメソッド
