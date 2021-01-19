@@ -2,6 +2,7 @@ package com.daigo.springboot_handson_4.controller;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @RequestMapping("/error")
+@Slf4j
 public class MainErrorController implements ErrorController {
 
     @Override
@@ -32,12 +34,15 @@ public class MainErrorController implements ErrorController {
         switch (code) {
             case 404:
                 message = "お探しのページがありませんでした。";
+                log.error("Error Code: " + code);
                 break;
             case 500:
                 message = "サーバ側でエラーが発生しました。";
+                log.error("Error Code: " + code);
                 break;
             default:
                 message = "不明なエラーです。";
+                log.error("Error Code: " + code);
                 break;
         }
         return message;
