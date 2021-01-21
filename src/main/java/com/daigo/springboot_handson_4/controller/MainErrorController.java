@@ -28,23 +28,21 @@ public class MainErrorController implements ErrorController {
      * @param statusCode ステータスコード
      * @return ユーザに表示するメッセージ
      */
-    public String errorMessenger(Object statusCode) {
+    private String errorMessenger(Object statusCode) {
         final int code = Integer.parseInt(String.valueOf(statusCode));
         String message;
         switch (code) {
             case 404:
                 message = "お探しのページがありませんでした。";
-                log.error("Error Code: " + code);
                 break;
             case 500:
                 message = "サーバ側でエラーが発生しました。";
-                log.error("Error Code: " + code);
                 break;
             default:
                 message = "不明なエラーです。";
-                log.error("Error Code: " + code);
                 break;
         }
+        log.error("Error Code: " + code);
         return message;
     }
 
