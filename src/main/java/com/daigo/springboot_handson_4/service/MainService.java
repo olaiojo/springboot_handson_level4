@@ -7,6 +7,7 @@ import com.daigo.springboot_handson_4.domains.CafeSearchMessenger;
 import com.daigo.springboot_handson_4.domains.geocoder.ContentsGeoCoder;
 import com.daigo.springboot_handson_4.domains.localsearch.LocalSearch;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -19,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MainService {
     // inject Config class
     private final YahooApiConfig yahooApiConfig;
@@ -26,18 +28,10 @@ public class MainService {
     private final LocalSearchConfig localSearchConfig;
 
     // variables
-    final String OUTPUT = "json";
+    static final String OUTPUT = "json";
 
     // instances
     private static final RestTemplate restTemplate = new RestTemplate();
-
-    public MainService(YahooApiConfig yahooApiConfig,
-                       GeoCoderConfig geoCoderConfig,
-                       LocalSearchConfig localSearchConfig) {
-        this.yahooApiConfig = yahooApiConfig;
-        this.geoCoderConfig = geoCoderConfig;
-        this.localSearchConfig = localSearchConfig;
-    }
 
     /**
      * userLocationから近い位置にあるcafeを探し、その情報を返却するメソッド
@@ -47,7 +41,7 @@ public class MainService {
      */
     public CafeSearchMessenger searchCafe(String userLocation) {
         CafeSearchMessenger cafeSearchMessenger = new CafeSearchMessenger();
-        final String CATEGORY = "landmark";
+        final String category = "landmark";
 
         if (userLocation.isEmpty()) {
             cafeSearchMessenger.setMessage("検索地点を入力してください。");
@@ -55,7 +49,7 @@ public class MainService {
         }
 
         // Access to ContentsGeoCoderAPI
-        ContentsGeoCoder geoCoderResponse = requestToGeocoderApi(userLocation, CATEGORY);
+        ContentsGeoCoder geoCoderResponse = requestToGeocoderApi(userLocation, category);
 
         if (Objects.nonNull(geoCoderResponse.getFeatureList())) {
             // extract lat and lon from geoCoderResponse
@@ -97,24 +91,24 @@ public class MainService {
      * リクエスト->バインドに失敗するとnullを入れて返す
      *
      * @param location 検索対象の地点名称
-     * @param CATEGORY 検索カテゴリ
+     * @param category 検索カテゴリ
      * @return レスポンスをバインドしたContentsGeoCoder型のインスタンス
      */
-    public ContentsGeoCoder requestToGeocoderApi(String location, String CATEGORY) {
-        final String GEOCODER_URL = UriComponentsBuilder
+    private ContentsGeoCoder requestToGeocoderApi(String location, String category) {
+        final String geocoderUrl = UriComponentsBuilder
                 .fromHttpUrl(geoCoderConfig.getHost())
                 .path(geoCoderConfig.getPath())
                 .queryParam("appid", yahooApiConfig.getAppId())
                 .queryParam("query", location)
-                .queryParam("category", CATEGORY)
+                .queryParam("category", category)
                 .queryParam("output", OUTPUT)
                 .build()
                 .toString();
-        log.info("GEOCODER_URL: {}", GEOCODER_URL);
+        log.info("GEOCODER_URL: {}", geocoderUrl);
 
         try {
             log.info("Request to ContentsGeoCoder is succeeded!");
-            return restTemplate.getForObject(GEOCODER_URL, ContentsGeoCoder.class);
+            return restTemplate.getForObject(geocoderUrl, ContentsGeoCoder.class);
         } catch (HttpClientErrorException e) {
             log.error("HttpClientErrorException, " + e);
             return null;
@@ -134,8 +128,8 @@ public class MainService {
      * @param results 検索結果の取得件数
      * @return レスポンスをバインドしたLocalSearch型のインスタンス
      */
-    public LocalSearch requestToLocalSearchApi(String gc, String[] latlon, int dist, int results) {
-        final String LOCAL_SEARCH_URL = UriComponentsBuilder
+    private LocalSearch requestToLocalSearchApi(String gc, String[] latlon, int dist, int results) {
+        final String localSearchUrl = UriComponentsBuilder
                 .fromHttpUrl(localSearchConfig.getHost())
                 .path(localSearchConfig.getPath())
                 .queryParam("appid", yahooApiConfig.getAppId())
@@ -148,11 +142,11 @@ public class MainService {
                 .queryParam("sort", "geo")
                 .build()
                 .toString();
-        log.info("LOCAL_SEARCH_URL: {}", LOCAL_SEARCH_URL);
+        log.info("LOCAL_SEARCH_URL: {}", localSearchUrl);
 
         try {
             log.info("Request to LocalSearch is succeeded!");
-            return restTemplate.getForObject(LOCAL_SEARCH_URL, LocalSearch.class);
+            return restTemplate.getForObject(localSearchUrl, LocalSearch.class);
         } catch (HttpClientErrorException e) {
             log.error("HttpClientErrorException, " + e);
             return null;
