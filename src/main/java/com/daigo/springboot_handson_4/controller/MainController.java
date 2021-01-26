@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @RequiredArgsConstructor
 public class MainController {
     // injection
-    final MainService mainService;
+    private final MainService mainService;
 
     /**
      * indexにリクエストがあったときのマッピングを行うメソッド
