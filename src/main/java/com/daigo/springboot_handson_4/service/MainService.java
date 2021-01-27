@@ -35,11 +35,12 @@ public class MainService {
     /**
      * userLocationから近い位置にあるcafeを探し、その情報を返却するメソッド
      *
-     * @param userLocation 検索の中心となる地点の名称
+     * @param userInputLocation 検索の中心となる地点の名称
      * @return cafeSearchMessenger 情報を格納したCafeSearchMessenger型のインスタンス
      */
-    public CafeSearchMessenger searchCafe(final String userLocation) {
+    public CafeSearchMessenger searchCafe(final String userInputLocation) {
         CafeSearchMessenger cafeSearchMessenger = new CafeSearchMessenger();
+        final String userLocation = userInputLocation.replaceAll("[?&=/\r\n]", ""); //リクエストパラメータに関係する文字は切る
         final String category = "landmark";
 
         if (userLocation.isEmpty()) {
