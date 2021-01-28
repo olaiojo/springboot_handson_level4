@@ -18,7 +18,7 @@ public class MainControllerTest {
     private MockMvc mockMvc;
 
     /**
-     * 1. 定義済のパス"/index"にgetリクエストがあったとき、ステータスコード200が返ってくることをテスト
+     * 1-1. 定義済のパス"/index"にgetリクエストがあったとき、ステータスコード200が返ってくることをテスト
      */
     @Test
     public void getIndexTest() throws Exception {
@@ -27,37 +27,77 @@ public class MainControllerTest {
     }
 
     /**
-     * 2. 未定義のパス"/hoge"にgetリクエストがあったとき、ステータスコード404が返ってくることをテスト
+     * 1-2. 定義済のパス"/search"にgetリクエストがあったとき、ステータスコード200が返ってくることをテスト
      */
     @Test
-    public void getUndefinedTest() throws Exception {
-        this.mockMvc.perform(get("/hoge"))
-                .andExpect(status().isNotFound());
+    public void getSearchIsOkTest() throws Exception {
+        this.mockMvc.perform(get("/search"))
+                .andExpect(status().isOk()); //200
     }
 
     /**
-     * 3. 定義済のパス"/index"にgetリクエストがあったとき、indexというView名をreturnしていることをテスト
+     * 2. 未定義のパス"/hoge"にgetリクエストがあったとき、ステータスコード404が返ってくることをテスト
      */
     @Test
-    public void returnIndexTest() throws Exception {
+    public void getUndefinedIsNotFoundTest() throws Exception {
+        this.mockMvc.perform(get("/hoge"))
+                .andExpect(status().isNotFound()); //404
+    }
+
+    /**
+     * 3-1. 定義済のパス"/index"にgetリクエストがあったとき、indexというView名をreturnしていることをテスト
+     */
+    @Test
+    public void getIndexThenReturnIndexTest() throws Exception {
         this.mockMvc.perform(get("/index"))
                 .andExpect(view().name("index"));
     }
 
     /**
-     * 4. 定義済のパス"/search"にパラメータuserLocation=横浜駅でgetリクエストがあったとき、正しい情報がModelにAddされることをテスト
+     * 3-2. 定義済のパス"/search"にgetリクエストがあったとき、indexというview名をreturnしていることをテスト
      */
     @Test
-    public void addAttributeModelTest() throws Exception {
-        //TODO: テスト時に環境変数が取れてない
-        // -> AppIDが入ってないからYahooのAPIが動かない
-        // -> ModelにAddされた値もNullになってる
-        // のを解消
-        // (application.propertiesに直でAppID入れるとpathできる)
-        this.mockMvc.perform(get("/search")
-                .param("userLocation", "横浜駅"))
-                .andExpect(model()
-                        .attribute("userLocation", "横浜駅"))
+    public void getSearchThenReturnIndexTest() throws Exception {
+        this.mockMvc.perform(get("/search"))
                 .andExpect(view().name("index"));
+    }
+
+    /**
+     * 4-1. 定義済のパス"/search"にパラメータuserLocation=横浜駅でgetリクエストがあったとき、正しい情報がModelにAddされることをテスト
+     */
+    @Test
+    public void addAttributeModelWhenNormalTest() throws Exception {
+        this.mockMvc.perform(get("/search").param("userLocation", "横浜駅"))
+                .andExpect(model().attribute("userLocation", "横浜駅"))
+                .andExpect(model().attribute("message", "近くにカフェが見つかりました。"));
+    }
+
+    /**
+     * 4-2. 定義済のパス"/search"にパラメータuserLocation=知床半島でgetリクエストがあったとき、正しい情報がModelにAddされることをテスト
+     */
+    @Test
+    public void addAttributeModelWhenNoCafesTest() throws Exception {
+        this.mockMvc.perform(get("/search").param("userLocation", "知床半島"))
+                .andExpect(model().attribute("userLocation", "知床半島"))
+                .andExpect(model().attribute("message", "近くにカフェがありませんでした。"));
+    }
+
+    /**
+     * 4-3. 定義済のパス"/search"にパラメータuserLocation=あああでgetリクエストがあったとき、正しい情報がModelにAddされることをテスト
+     */
+    @Test
+    public void addAttributeModelWhenInvalidLocationTest() throws Exception {
+        this.mockMvc.perform(get("/search").param("userLocation", "あああ"))
+                .andExpect(model().attribute("userLocation", "あああ"))
+                .andExpect(model().attribute("message", "ロケーションが見つかりませんでした。"));
+    }
+
+    /**
+     * 4-4. 定義済のパス"/search"にパラメータuserLocation=空でgetリクエストがあったとき、正しい情報がModelにAddされることをテスト
+     */
+    @Test
+    public void addAttributeModelWhenEmptyLocationTest() throws Exception {
+        this.mockMvc.perform(get("/search").param("userLocation", ""))
+                .andExpect(model().attribute("message", "検索地点を入力してください。"));
     }
 }
