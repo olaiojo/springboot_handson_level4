@@ -6,6 +6,7 @@ import com.daigo.springboot_handson_4.config.YahooApiConfig;
 import com.daigo.springboot_handson_4.domains.CafeSearchMessenger;
 import com.daigo.springboot_handson_4.domains.geocoder.ContentsGeoCoder;
 import com.daigo.springboot_handson_4.domains.localsearch.LocalSearch;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -39,55 +40,114 @@ public class MainService {
      * @return cafeSearchMessenger 情報を格納したCafeSearchMessenger型のインスタンス
      */
     public CafeSearchMessenger searchCafe(final String userInputLocation) {
-        CafeSearchMessenger cafeSearchMessenger = new CafeSearchMessenger();
+        ContentsGeoCoder geoCoderResponse;
+        LocalSearch localSearchResponse;
+        final CafeSearchMessenger messenger = new CafeSearchMessenger();
         final String userLocation = userInputLocation.replaceAll("[?&=/\r\n]", ""); //リクエストパラメータに関係する文字は切る
         final String category = "landmark";
 
         if (userLocation.isEmpty()) {
-            cafeSearchMessenger.setMessage("検索地点を入力してください。");
-            return cafeSearchMessenger;
+            invalidLocation(messenger);
+            return messenger;
         }
 
-        // Access to ContentsGeoCoderAPI
-        requestToGeocoderApi(userLocation, category).ifPresent((geoCoderResponse) -> {
-            if (Objects.nonNull(geoCoderResponse.getFeatureList())) {
-                cafeSearchMessenger.setUserLocation(geoCoderResponse.getFeatureList().get(0).getName());
-                cafeSearchMessenger
-                        .setCoordinates(geoCoderResponse.getFeatureList().get(0).getGeometry().getCoordinates());
+        // コンテンツジオコーダAPIへのアクセス
+        try {
+            geoCoderResponse = requestToGeocoderApi(userLocation, category).orElseThrow();
+        } catch (NoSuchElementException e) {
+            // コンテンツジオコーダAPIで不具合があった場合
+            log.error("NoSuchElementException", e);
+            locationNotFound(messenger, userLocation);
+            return messenger;
+        }
 
-                final String[] latlon = geoCoderResponse
-                        .getFeatureList()
-                        .get(0)
-                        .getGeometry()
-                        .getCoordinates()
-                        .split(",", 0);
-                final int dist = 10;  //中心からの検索距離
-                final int results = 10;  //取得する件数
-                final String gc = "0115001";  //業種コード
+        // コンテンツジオコーダAPIへのリクエストは成功したが結果がなかった場合
+        if (Objects.isNull(geoCoderResponse.getFeatureList())) {
+            locationNotFound(messenger, userLocation);
+            return messenger;
+        }
 
-                // Access to LocalSearchAPI
-                requestToLocalSearchApi(gc, latlon, dist, results).ifPresent((localSearchResponse) -> {
-                    if (Objects.nonNull(localSearchResponse.getFeatureList())) {
-                        cafeSearchMessenger.setMessage("近くにカフェが見つかりました。");
-                        cafeSearchMessenger
-                                .setResultsNumber(String.valueOf(localSearchResponse.getResultInfo().getCount()));
-                        cafeSearchMessenger.setFeatures(localSearchResponse.getFeatureList());
-                    } else {
-                        cafeSearchMessenger.setMessage("近くにカフェがありませんでした。");
-                        cafeSearchMessenger.setResultsNumber("0");
-                    }
-                });
-            } else {
-                cafeSearchMessenger.setMessage("ロケーションが見つかりませんでした。");
-                cafeSearchMessenger.setUserLocation(userLocation);
-                cafeSearchMessenger.setResultsNumber("0");
-            }
+        // ローカルサーチAPIへのアクセス
+        try {
+            localSearchResponse =
+                    requestToLocalSearchApi("0115001", extractLatLon(geoCoderResponse), 10, 10).orElseThrow();
+        } catch (NoSuchElementException e) {
+            // ローカルサーチAPIで不具合があった場合
+            log.error("NoSuchElementException", e);
+            cafeNotFound(messenger);
+            return messenger;
+        }
 
-        });
+        // ローカルサーチAPIへのリクエストは成功したが結果がなかった場合
+        if (Objects.isNull(localSearchResponse.getFeatureList())) {
+            cafeNotFound(messenger);
+        }
 
-        return cafeSearchMessenger;
+        cafesAreFound(geoCoderResponse, localSearchResponse, messenger);
+
+        return messenger;
     }
 
+    /**
+     * 検索地点が空であるとき、CafeSearchMessenger型インスタンスにその旨をセットするメソッド
+     *
+     * @param messenger CafeSearchMessenger型のインスタンス
+     */
+    private void invalidLocation(CafeSearchMessenger messenger) {
+        messenger.setMessage("検索地点を入力してください。");
+    }
+
+    /**
+     * カフェが見つかったとき、CafeSearchMessenger型インスタンスにその旨をセットするメソッド
+     *
+     * @param messenger CafeSearchMessenger型のインスタンス
+     */
+    private void cafesAreFound(final ContentsGeoCoder geoCoderResponse,
+                               final LocalSearch localSearchResponse,
+                               final CafeSearchMessenger messenger) {
+        messenger.setUserLocation(geoCoderResponse.getFeatureList().get(0).getName());
+        messenger.setCoordinates(geoCoderResponse.getFeatureList().get(0).getGeometry().getCoordinates());
+        messenger.setMessage("近くにカフェが見つかりました。");
+        messenger.setResultsNumber(String.valueOf(localSearchResponse.getResultInfo().getCount()));
+        messenger.setFeatures(localSearchResponse.getFeatureList());
+    }
+
+    /**
+     * ロケーションが見つからなかったとき、CafeSearchMessenger型インスタンスにその旨をセットするメソッド
+     *
+     * @param messenger CafeSearchMessenger型のインスタンス
+     */
+    private void locationNotFound(final CafeSearchMessenger messenger, final String location) {
+        messenger.setMessage("ロケーションが見つかりませんでした。");
+        messenger.setUserLocation(location);
+        messenger.setResultsNumber("0");
+    }
+
+    /**
+     * カフェが見つからなかったとき、CafeSearchMessenger型インスタンスにその旨をセットするメソッド
+     *
+     * @param messenger CafeSearchMessenger型のインスタンス
+     */
+    private void cafeNotFound(final CafeSearchMessenger messenger) {
+        messenger.setMessage("近くにカフェがありませんでした。");
+        messenger.setResultsNumber("0");
+    }
+
+
+    /**
+     * ContentsGeoCoder型から緯度経度を抽出して配列で返却するメソッド。[経度, 緯度]
+     *
+     * @param geoCoder コンテンツジオコーダAPIのレスポンスをバインドしたインスタンス
+     * @return [経度, 緯度]
+     */
+    private String[] extractLatLon(final ContentsGeoCoder geoCoder) {
+        return geoCoder
+                .getFeatureList()
+                .get(0)
+                .getGeometry()
+                .getCoordinates()
+                .split(",", 0);
+    }
 
     /**
      * コンテンツジオコーダAPIにリクエストを行い、そのレスポンスを返却するメソッド
