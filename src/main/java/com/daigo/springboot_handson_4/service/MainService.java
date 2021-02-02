@@ -74,17 +74,18 @@ public class MainService {
         } catch (NoSuchElementException e) {
             // ローカルサーチAPIで不具合があった場合
             log.error("NoSuchElementException", e);
-            cafeNotFound(messenger);
+            cafeNotFound(messenger, userLocation);
             return messenger;
         }
 
         // ローカルサーチAPIへのリクエストは成功したが結果がなかった場合
         if (Objects.isNull(localSearchResponse.getFeatureList())) {
-            cafeNotFound(messenger);
+            cafeNotFound(messenger, userLocation);
+            return messenger;
         }
 
+        // 正常系
         cafesAreFound(geoCoderResponse, localSearchResponse, messenger);
-
         return messenger;
     }
 
@@ -128,8 +129,9 @@ public class MainService {
      *
      * @param messenger CafeSearchMessenger型のインスタンス
      */
-    private void cafeNotFound(final CafeSearchMessenger messenger) {
+    private void cafeNotFound(final CafeSearchMessenger messenger, final String location) {
         messenger.setMessage("近くにカフェがありませんでした。");
+        messenger.setUserLocation(location);
         messenger.setResultsNumber("0");
     }
 
