@@ -6,11 +6,14 @@
     <!-- タイトル -->
     <title th:text="${title}">Title</title>
     <!-- 共通CSS -->
+    <link rel="stylesheet" href="webjars/bootstrap/4.1.1/css/bootstrap.min.css">
     <link th:href="@{/css/common.css}" rel="stylesheet" type="text/css">
     <!-- viewごとのCSS なければ何もしない -->
     <th:block th:replace="${links}?: _"/>
     <!-- 共通JS -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="webjars/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <!-- viewごとのJS なければ何もしない -->
     <th:block th:replace="${scripts}?: _"/>
 </head>
