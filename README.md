@@ -5,12 +5,13 @@
 ## 画面
 
 ページへの初アクセス時。
-<img width="1552" alt="スクリーンショット 2020-11-12 6 13 55" src="https://user-images.githubusercontent.com/25107943/98865790-488cdd00-24af-11eb-8f06-e27846db7a97.png">
+<img width="1039" alt="image" src="https://user-images.githubusercontent.com/25107943/106739707-c864b680-665c-11eb-82f8-3a5290c46960.png">
 
 検索実行時。例では横浜駅を使用。
-<img width="1552" alt="スクリーンショット 2020-11-12 6 14 31" src="https://user-images.githubusercontent.com/25107943/98865816-4e82be00-24af-11eb-8693-e33f9076dde1.png">
+<img width="1039" alt="image" src="https://user-images.githubusercontent.com/25107943/106739777-dd414a00-665c-11eb-8131-11e88e85c691.png">
 
-検索クエリが空だった場合、湘南台駅が使用される。
-<img width="1552" alt="スクリーンショット 2020-11-12 6 14 07" src="https://user-images.githubusercontent.com/25107943/98865803-4c206400-24af-11eb-8d53-e145bdfecb5c.png">
+カフェが見つからなかった場合。
+<img width="1039" alt="image" src="https://user-images.githubusercontent.com/25107943/106739901-14176000-665d-11eb-926f-5ab9577480a7.png">
 
-
+検索クエリが空だった場合は、入力が促される。
+<img width="1039" alt="image" src="https://user-images.githubusercontent.com/25107943/106739843-fa761880-665c-11eb-8906-079c5c4454c4.png">
